@@ -1,0 +1,146 @@
+[
+  {
+    "id": "1",
+    "slug": "dashboard",
+    "title_en": "Data Dashboard",
+    "title_kr": "데이터 대시보드",
+    "category": "data",
+    "coreType": "layered-panels",
+    "accentColor": "#7af0ff",
+    "cover": "/placeholder.jpg",
+    "slides": [
+      {
+        "type": "problem",
+        "title_en": "Problem",
+        "title_kr": "문제",
+        "content_en": "Data was abundant but meaning was unclear.",
+        "content_kr": "데이터는 많았지만 의미를 파악하기 어려웠습니다.",
+        "image": ""
+      },
+      {
+        "type": "approach",
+        "title_en": "Approach",
+        "title_kr": "접근 방식",
+        "content_en": "Built a real-time analysis dashboard.",
+        "content_kr": "실시간 분석 대시보드를 구축했습니다.",
+        "image": ""
+      },
+      {
+        "type": "result",
+        "title_en": "Result",
+        "title_kr": "결과",
+        "content_en": "Decision time reduced by 80%.",
+        "content_kr": "의사결정 시간 80% 단축.",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "slug": "automation",
+    "title_en": "Internal Automation",
+    "title_kr": "내부 자동화",
+    "category": "system",
+    "coreType": "rotating-loop",
+    "accentColor": "#7af0ff",
+    "cover": "/placeholder.jpg",
+    "slides": [
+      {
+        "type": "problem",
+        "title_en": "Problem",
+        "title_kr": "문제",
+        "content_en": "Too much repetitive work.",
+        "content_kr": "반복 작업이 너무 많았습니다.",
+        "image": ""
+      },
+      {
+        "type": "approach",
+        "title_en": "Approach",
+        "title_kr": "접근 방식",
+        "content_en": "Built an automation system.",
+        "content_kr": "자동화 시스템을 구축했습니다.",
+        "image": ""
+      },
+      {
+        "type": "result",
+        "title_en": "Result",
+        "title_kr": "결과",
+        "content_en": "Work time reduced by 90%.",
+        "content_kr": "작업 시간 90% 감소.",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "slug": "game",
+    "title_en": "Game Project",
+    "title_kr": "게임 프로젝트",
+    "category": "experience",
+    "coreType": "liquid-knot",
+    "accentColor": "#b48dff",
+    "cover": "/placeholder.jpg",
+    "slides": [
+      {
+        "type": "problem",
+        "title_en": "Problem",
+        "title_kr": "문제",
+        "content_en": "Need for interactive content.",
+        "content_kr": "인터랙티브 콘텐츠가 필요했습니다.",
+        "image": ""
+      },
+      {
+        "type": "approach",
+        "title_en": "Approach",
+        "title_kr": "접근 방식",
+        "content_en": "Developed a Unity-based game.",
+        "content_kr": "Unity 기반 게임을 제작했습니다.",
+        "image": ""
+      },
+      {
+        "type": "result",
+        "title_en": "Result",
+        "title_kr": "결과",
+        "content_en": "Delivered an engaging experience.",
+        "content_kr": "몰입감 있는 경험을 전달했습니다.",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "slug": "platform",
+    "title_en": "Platform",
+    "title_kr": "플랫폼",
+    "category": "platform",
+    "coreType": "crystal-shell",
+    "accentColor": "#7af0ff",
+    "cover": "/placeholder.jpg",
+    "slides": [
+      {
+        "type": "problem",
+        "title_en": "Problem",
+        "title_kr": "문제",
+        "content_en": "Scalable architecture needed.",
+        "content_kr": "확장 가능한 아키텍처가 필요했습니다.",
+        "image": ""
+      },
+      {
+        "type": "approach",
+        "title_en": "Approach",
+        "title_kr": "접근 방식",
+        "content_en": "Designed network of services.",
+        "content_kr": "서비스 네트워크를 설계했습니다.",
+        "image": ""
+      },
+      {
+        "type": "result",
+        "title_en": "Result",
+        "title_kr": "결과",
+        "content_en": "Reliable, scalable platform.",
+        "content_kr": "안정적이고 확장 가능한 플랫폼을 구축했습니다.",
+        "image": ""
+      }
+    ]
+  }
+]

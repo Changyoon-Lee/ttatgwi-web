@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "title_en": "TATTGWI",
+    "title_kr": "TATTGWI",
+    "subtitle_en": "We sense what matters and build it into form.",
+    "subtitle_kr": "필요한 것을 감지하고 형태로 만듭니다."
+  },
+  "domains": {
+    "structure_en": "Structure",
+    "structure_kr": "구조",
+    "structure_desc_en": "We design systems",
+    "structure_desc_kr": "시스템 구조를 설계합니다",
+    "insight_en": "Insight",
+    "insight_kr": "인사이트",
+    "insight_desc_en": "We turn data into clarity",
+    "insight_desc_kr": "데이터를 의미로 바꿉니다",
+    "build_en": "Build",
+    "build_kr": "빌드",
+    "build_desc_en": "We create working products",
+    "build_desc_kr": "실제로 동작하는 제품을 만듭니다",
+    "experience_en": "Experience",
+    "experience_kr": "경험",
+    "experience_desc_en": "We craft interactive worlds",
+    "experience_desc_kr": "인터랙티브 경험을 만듭니다"
+  },
+  "method": {
+    "title_en": "Problem Driven Development",
+    "title_kr": "문제 주도 개발",
+    "stage1_en": "Understand the problem",
+    "stage1_kr": "문제를 이해한다",
+    "stage2_en": "Find the core",
+    "stage2_kr": "본질을 찾는다",
+    "stage3_en": "Design the structure",
+    "stage3_kr": "구조를 설계한다",
+    "stage4_en": "Choose the technology",
+    "stage4_kr": "기술을 선택한다",
+    "stage5_en": "Build the system",
+    "stage5_kr": "시스템을 만든다"
+  },
+  "team": {
+    "message_en": "A small team with overlapping abilities working across the entire system.",
+    "message_kr": "서로 겹치는 능력을 가진 작은 팀이 시스템 전체를 함께 만듭니다."
+  },
+  "tech": {
+    "philosophy_en": "Technology is not the goal.",
+    "philosophy_sub_en": "It is the tool we choose to solve the right problem.",
+    "philosophy_kr": "기술은 목적이 아닙니다.",
+    "philosophy_sub_kr": "우리는 문제에 맞는 기술을 선택합니다."
+  },
+  "contact": {
+    "cta_en": "Start a conversation",
+    "cta_kr": "대화를 시작하세요"
+  }
+}

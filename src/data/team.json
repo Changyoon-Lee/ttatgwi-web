@@ -1,0 +1,66 @@
+{
+  "members": [
+    {
+      "id": "member_a",
+      "name": "Member A",
+      "title_en": "Full Stack Problem Solver",
+      "title_kr": "풀스택 문제 해결 개발자",
+      "bio_en": "Focused on system architecture and scalable backend systems.",
+      "bio_kr": "시스템 아키텍처와 확장 가능한 백엔드에 강점을 가진 문제 해결형 개발자",
+      "primary_domain": "architecture",
+      "secondary_domains": ["backend", "data"],
+      "skills": ["React", "Node.js", "Python", "Docker"],
+      "projects": ["dashboard", "platform"]
+    },
+    {
+      "id": "member_b",
+      "name": "Member B",
+      "title_en": "Backend & Data",
+      "title_kr": "백엔드·데이터",
+      "bio_en": "Backend systems and data pipelines.",
+      "bio_kr": "백엔드 시스템과 데이터 파이프라인 구축",
+      "primary_domain": "backend",
+      "secondary_domains": ["data", "infra"],
+      "skills": ["Python", "Elasticsearch", "Kubernetes", "Docker"],
+      "projects": ["automation", "dashboard"]
+    },
+    {
+      "id": "member_c",
+      "name": "Member C",
+      "title_en": "Experience & Frontend",
+      "title_kr": "경험·프론트엔드",
+      "bio_en": "Interactive experiences and frontend architecture.",
+      "bio_kr": "인터랙티브 경험과 프론트엔드 아키텍처",
+      "primary_domain": "game",
+      "secondary_domains": ["architecture"],
+      "skills": ["React", "Unity", "Node.js"],
+      "projects": ["game", "platform"]
+    },
+    {
+      "id": "member_d",
+      "name": "Member D",
+      "title_en": "Infrastructure & Security",
+      "title_kr": "인프라·보안",
+      "bio_en": "Infrastructure and secure architecture.",
+      "bio_kr": "인프라와 보안 아키텍처",
+      "primary_domain": "infra",
+      "secondary_domains": ["security", "backend"],
+      "skills": ["Kubernetes", "Docker", "Python"],
+      "projects": ["platform", "automation"]
+    }
+  ],
+  "domains": {
+    "architecture": { "label_en": "Architecture", "label_kr": "아키텍처" },
+    "backend": { "label_en": "Backend Systems", "label_kr": "백엔드 시스템" },
+    "data": { "label_en": "Data Analysis", "label_kr": "데이터 분석" },
+    "infra": { "label_en": "Infrastructure", "label_kr": "인프라" },
+    "game": { "label_en": "Game & Experience", "label_kr": "게임·경험" },
+    "security": { "label_en": "Security", "label_kr": "보안" }
+  },
+  "links": [
+    ["member_a", "member_b"],
+    ["member_a", "member_c"],
+    ["member_b", "member_d"],
+    ["member_c", "member_d"]
+  ]
+}
