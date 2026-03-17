@@ -10,7 +10,9 @@
       "primary_domain": "architecture",
       "secondary_domains": ["backend", "data"],
       "skills": ["React", "Node.js", "Python", "Docker"],
-      "projects": ["dashboard", "platform"]
+      "projects": ["dashboard", "platform"],
+      "avatar_url": "",
+      "github_url": ""
     },
     {
       "id": "member_b",
@@ -22,7 +24,9 @@
       "primary_domain": "backend",
       "secondary_domains": ["data", "infra"],
       "skills": ["Python", "Elasticsearch", "Kubernetes", "Docker"],
-      "projects": ["automation", "dashboard"]
+      "projects": ["automation", "dashboard"],
+      "avatar_url": "",
+      "github_url": ""
     },
     {
       "id": "member_c",
@@ -34,7 +38,9 @@
       "primary_domain": "game",
       "secondary_domains": ["architecture"],
       "skills": ["React", "Unity", "Node.js"],
-      "projects": ["game", "platform"]
+      "projects": ["game", "platform"],
+      "avatar_url": "",
+      "github_url": ""
     },
     {
       "id": "member_d",
@@ -46,7 +52,9 @@
       "primary_domain": "infra",
       "secondary_domains": ["security", "backend"],
       "skills": ["Kubernetes", "Docker", "Python"],
-      "projects": ["platform", "automation"]
+      "projects": ["platform", "automation"],
+      "avatar_url": "",
+      "github_url": ""
     }
   ],
   "domains": {

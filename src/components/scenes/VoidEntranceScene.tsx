@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
+import { useStore } from "@/lib/store";
 import { EntryVoidParticleField } from "./EntryVoidParticleField";
 import { preloadSceneAssets } from "@/lib/preload";
 
@@ -12,9 +13,10 @@ import { preloadSceneAssets } from "@/lib/preload";
  */
 export function VoidEntranceScene() {
   const groupRef = useRef<THREE.Group>(null);
+  const setScene2Ready = useStore((s) => s.setScene2Ready);
   useEffect(() => {
-    preloadSceneAssets();
-  }, []);
+    preloadSceneAssets(() => setScene2Ready(true));
+  }, [setScene2Ready]);
   return (
     <group ref={groupRef}>
       <EntryVoidParticleField />

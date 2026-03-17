@@ -220,10 +220,6 @@ export function ProjectRoomScene() {
   if (!project) {
     return (
       <group>
-        <mesh position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[20, 20]} />
-          <meshPhysicalMaterial color={GLASS} transparent opacity={0.06} transmission={0.9} side={THREE.DoubleSide} />
-        </mesh>
         <mesh position={[0, 0, 0]}>
           <octahedronGeometry args={[2, 0]} />
           <meshPhysicalMaterial color={ACCENT} transparent opacity={0.35} transmission={0.85} thickness={0.2} roughness={0.15} />

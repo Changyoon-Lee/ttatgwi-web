@@ -74,22 +74,7 @@ const NODE_CONNECTIONS: [string, string][] = [
 ];
 
 function GalleryEnvironment() {
-  return (
-    <>
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -2, -20]}
-        receiveShadow
-      >
-        <planeGeometry args={[60, 60]} />
-        <meshStandardMaterial
-          color={FLOOR_COLOR}
-          metalness={0.5}
-          roughness={0.5}
-        />
-      </mesh>
-    </>
-  );
+  return null;
 }
 
 function ProjectNode({

@@ -3,7 +3,7 @@
 import { useRef, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { MeshTransmissionMaterial, Text, Html } from "@react-three/drei";
+import { MeshTransmissionMaterial, Text, Html, Billboard, Image } from "@react-three/drei";
 import { useStore } from "@/lib/store";
 import translations from "@/data/translations.json";
 
@@ -11,6 +11,8 @@ const CORE_COLOR = "#9be8ff";
 const NODE_COLOR = "#7af0ff";
 const RING_COLOR = "#3a4aff";
 const PARTICLE_COUNT = 2000;
+
+const ICON_COLOR = "7af0ff";
 
 type TechItem = {
   id: string;
@@ -22,18 +24,20 @@ type TechItem = {
   radius: number;
   speed: number;
   angleOffset: number;
+  /** simpleicons slug for cdn.simpleicons.org */
+  iconSlug: string;
 };
 
 const TECH_ITEMS: TechItem[] = [
-  { id: "react", name: "React", labelEn: "UI layer", labelKr: "UI 레이어", descEn: "Frontend architecture", descKr: "프론트엔드 아키텍처", radius: 4.2, speed: 0.4, angleOffset: 0 },
-  { id: "node", name: "Node.js", labelEn: "Runtime", labelKr: "런타임", descEn: "Server-side JavaScript", descKr: "서버 사이드 JavaScript", radius: 4.2, speed: 0.35, angleOffset: 1.2 },
-  { id: "python", name: "Python", labelEn: "Logic & data", labelKr: "로직·데이터", descEn: "Backend and tooling", descKr: "백엔드 및 도구", radius: 4.5, speed: 0.38, angleOffset: 2.1 },
-  { id: "unity", name: "Unity", labelEn: "Experience", labelKr: "경험", descEn: "Interactive experiences", descKr: "인터랙티브 경험", radius: 4.5, speed: 0.33, angleOffset: 3 },
-  { id: "elastic", name: "Elasticsearch", labelEn: "Search", labelKr: "검색", descEn: "Search and analytics engine", descKr: "검색·분석 엔진", radius: 5.8, speed: 0.28, angleOffset: 0.5 },
-  { id: "polars", name: "Polars", labelEn: "Data processing", labelKr: "데이터 처리", descEn: "Fast dataframes", descKr: "고속 데이터프레임", radius: 5.8, speed: 0.3, angleOffset: 1.8 },
-  { id: "pandas", name: "Pandas", labelEn: "Analysis", labelKr: "분석", descEn: "Data analysis", descKr: "데이터 분석", radius: 6, speed: 0.26, angleOffset: 3.2 },
-  { id: "docker", name: "Docker", labelEn: "Containers", labelKr: "컨테이너", descEn: "Deployment and isolation", descKr: "배포·격리", radius: 6.8, speed: 0.22, angleOffset: 0.8 },
-  { id: "k8s", name: "Kubernetes", labelEn: "Infrastructure", labelKr: "인프라", descEn: "Orchestration at scale", descKr: "대규모 오케스트레이션", radius: 6.8, speed: 0.2, angleOffset: 2.4 },
+  { id: "react", name: "React", labelEn: "UI layer", labelKr: "UI 레이어", descEn: "Frontend architecture", descKr: "프론트엔드 아키텍처", radius: 4.2, speed: 0.4, angleOffset: 0, iconSlug: "react" },
+  { id: "node", name: "Node.js", labelEn: "Runtime", labelKr: "런타임", descEn: "Server-side JavaScript", descKr: "서버 사이드 JavaScript", radius: 4.2, speed: 0.35, angleOffset: 1.2, iconSlug: "nodedotjs" },
+  { id: "python", name: "Python", labelEn: "Logic & data", labelKr: "로직·데이터", descEn: "Backend and tooling", descKr: "백엔드 및 도구", radius: 4.5, speed: 0.38, angleOffset: 2.1, iconSlug: "python" },
+  { id: "unity", name: "Unity", labelEn: "Experience", labelKr: "경험", descEn: "Interactive experiences", descKr: "인터랙티브 경험", radius: 4.5, speed: 0.33, angleOffset: 3, iconSlug: "unity" },
+  { id: "elastic", name: "Elasticsearch", labelEn: "Search", labelKr: "검색", descEn: "Search and analytics engine", descKr: "검색·분석 엔진", radius: 5.8, speed: 0.28, angleOffset: 0.5, iconSlug: "elasticsearch" },
+  { id: "polars", name: "Polars", labelEn: "Data processing", labelKr: "데이터 처리", descEn: "Fast dataframes", descKr: "고속 데이터프레임", radius: 5.8, speed: 0.3, angleOffset: 1.8, iconSlug: "polars" },
+  { id: "pandas", name: "Pandas", labelEn: "Analysis", labelKr: "분석", descEn: "Data analysis", descKr: "데이터 분석", radius: 6, speed: 0.26, angleOffset: 3.2, iconSlug: "pandas" },
+  { id: "docker", name: "Docker", labelEn: "Containers", labelKr: "컨테이너", descEn: "Deployment and isolation", descKr: "배포·격리", radius: 6.8, speed: 0.22, angleOffset: 0.8, iconSlug: "docker" },
+  { id: "k8s", name: "Kubernetes", labelEn: "Infrastructure", labelKr: "인프라", descEn: "Orchestration at scale", descKr: "대규모 오케스트레이션", radius: 6.8, speed: 0.2, angleOffset: 2.4, iconSlug: "kubernetes" },
 ];
 
 function CoreCrystal() {
@@ -92,9 +96,9 @@ function OrbitNode({
   onHover: (v: boolean) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const meshRef = useRef<THREE.Mesh>(null);
-  const geometry = useMemo(() => new THREE.IcosahedronGeometry(0.35, 1), []);
+  const scaleGroupRef = useRef<THREE.Group>(null);
   const scaleVec = useRef(new THREE.Vector3(1, 1, 1));
+  const iconUrl = `https://cdn.simpleicons.org/${tech.iconSlug}/${ICON_COLOR}`;
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -103,12 +107,12 @@ function OrbitNode({
       groupRef.current.position.x = Math.cos(angle) * tech.radius;
       groupRef.current.position.z = Math.sin(angle) * tech.radius;
     }
-    if (meshRef.current) {
+    if (scaleGroupRef.current) {
       scaleVec.current.lerp(
-        new THREE.Vector3(isHovered ? 1.4 : 1, isHovered ? 1.4 : 1, isHovered ? 1.4 : 1),
+        new THREE.Vector3(isHovered ? 1.2 : 1, isHovered ? 1.2 : 1, isHovered ? 1.2 : 1),
         0.12
       );
-      meshRef.current.scale.copy(scaleVec.current);
+      scaleGroupRef.current.scale.copy(scaleVec.current);
     }
   });
 
@@ -118,65 +122,67 @@ function OrbitNode({
 
   return (
     <group ref={groupRef}>
-      <mesh
-        ref={meshRef}
-        geometry={geometry}
-        onPointerEnter={(e) => {
-          e.stopPropagation();
-          onHover(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerLeave={() => {
-          onHover(false);
-          document.body.style.cursor = "default";
-        }}
-      >
-        <meshStandardMaterial
-          color={NODE_COLOR}
-          emissive="#1a8cff"
-          emissiveIntensity={0.4}
-          metalness={0.1}
-          roughness={0.4}
-        />
-      </mesh>
-      <Text
-        position={[0, 0.6, 0]}
-        fontSize={0.28}
-        color="#c9e7ff"
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={2.5}
-      >
-        {tech.name}
-      </Text>
-      {!isHovered && (
-        <Text
-          position={[0, 0.35, 0]}
-          fontSize={0.16}
-          color="rgba(201,231,255,0.8)"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={2.2}
-        >
-          {label}
-        </Text>
-      )}
-      {isHovered && (
-        <Html
-          center
-          position={[0, 0.9, 0]}
-          distanceFactor={4}
-          style={{
-            pointerEvents: "none",
-            color: "#c9e7ff",
-            fontSize: 11,
-            whiteSpace: "nowrap",
-            textAlign: "center",
+      <group ref={scaleGroupRef}>
+      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
+        <group
+          onPointerEnter={(e) => {
+            e.stopPropagation();
+            onHover(true);
+            document.body.style.cursor = "pointer";
+          }}
+          onPointerLeave={() => {
+            onHover(false);
+            document.body.style.cursor = "default";
           }}
         >
-          {desc}
-        </Html>
-      )}
+          <Image
+            url={iconUrl}
+            position={[0, 0, 0]}
+            scale={0.7}
+            transparent
+            opacity={0.95}
+          />
+          <Text
+            position={[0, 0.5, 0]}
+            fontSize={0.28}
+            color="#c9e7ff"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={2.5}
+          >
+            {tech.name}
+          </Text>
+          {!isHovered && (
+            <Text
+              position={[0, 0.25, 0]}
+              fontSize={0.16}
+              color="rgba(201,231,255,0.8)"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={2.2}
+            >
+              {label}
+            </Text>
+          )}
+        </group>
+        {isHovered && (
+          <Html
+            center
+            position={[0, 0.75, 0]}
+            distanceFactor={4}
+            style={{
+              pointerEvents: "none",
+              color: "#c9e7ff",
+              fontSize: 11,
+              whiteSpace: "nowrap",
+              textAlign: "center",
+            }}
+          >
+            {desc}
+          </Html>
+        )}
+      </Billboard>
+      </group>
     </group>
   );
 }

@@ -176,8 +176,19 @@ export function getSceneIdFromIndex(index: number): SceneId {
   return SCENE_ORDER[Math.max(0, Math.min(index, SCENE_ORDER.length - 1))] ?? "void";
 }
 
-/** Visible scene indices: current ± 1 for render performance. */
+/**
+ * Visible scene indices for render performance.
+ * Default: current ± 1, but corridor(hero→corridor) 구간에서는 hero를 제외하고 corridor+다음 씬만 렌더한다.
+ */
 export function getVisibleSceneIndices(currentIndex: number): number[] {
+  // corridor 인덱스는 SCENE_ORDER 상 2 (void, hero, corridor, ...).
+  if (currentIndex === 2) {
+    const out: number[] = [];
+    if (currentIndex <= SCENE_ORDER.length - 1) out.push(currentIndex);
+    if (currentIndex + 1 <= SCENE_ORDER.length - 1) out.push(currentIndex + 1);
+    return out;
+  }
+
   const min = Math.max(0, currentIndex - 1);
   const max = Math.min(SCENE_ORDER.length - 1, currentIndex + 1);
   const out: number[] = [];

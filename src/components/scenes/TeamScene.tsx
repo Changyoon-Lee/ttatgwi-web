@@ -26,6 +26,10 @@ type Member = {
   secondary_domains: string[];
   skills: string[];
   projects: string[];
+  /** Profile image URL; shown on the node if set. */
+  avatar_url?: string;
+  /** GitHub or other profile link; node click opens this. */
+  github_url?: string;
 };
 
 type DomainMap = Record<string, { label_en: string; label_kr: string }>;
@@ -182,31 +186,86 @@ function MemberNode({
     ? domains[member.primary_domain][`label_${lang === "ko" ? "kr" : "en"}`]
     : member.primary_domain;
 
+  const hasLink = Boolean(member.github_url);
+  const hasAvatar = Boolean(member.avatar_url);
+
+  const handleClick = () => {
+    if (member.github_url) window.open(member.github_url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <group position={pos}>
       <DomainRing position={[0, 0, 0]} />
       <SkillParticles count={SKILL_COUNT_PER_MEMBER} />
-      <mesh
-        ref={meshRef}
-        geometry={geometry}
-        onPointerEnter={(e) => {
-          e.stopPropagation();
-          onHover(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerLeave={() => {
-          onHover(false);
-          document.body.style.cursor = "default";
-        }}
-      >
-        <meshStandardMaterial
-          color={ACCENT}
-          emissive={isHovered ? ACCENT : "#0a2a4a"}
-          emissiveIntensity={isHovered ? 0.25 : 0.05}
-          metalness={0.1}
-          roughness={0.4}
-        />
-      </mesh>
+      {!hasAvatar && (
+        <mesh
+          ref={meshRef}
+          geometry={geometry}
+          onPointerEnter={(e) => {
+            e.stopPropagation();
+            onHover(true);
+            document.body.style.cursor = hasLink ? "pointer" : "default";
+          }}
+          onPointerLeave={() => {
+            onHover(false);
+            document.body.style.cursor = "default";
+          }}
+          onClick={hasLink ? handleClick : undefined}
+        >
+          <meshStandardMaterial
+            color={ACCENT}
+            emissive={isHovered ? ACCENT : "#0a2a4a"}
+            emissiveIntensity={isHovered ? 0.25 : 0.05}
+            metalness={0.1}
+            roughness={0.4}
+          />
+        </mesh>
+      )}
+      {hasAvatar && (
+        <group
+          ref={meshRef}
+          onPointerEnter={(e) => {
+            e.stopPropagation();
+            onHover(true);
+            document.body.style.cursor = hasLink ? "pointer" : "default";
+          }}
+          onPointerLeave={() => {
+            onHover(false);
+            document.body.style.cursor = "default";
+          }}
+          onClick={hasLink ? handleClick : undefined}
+        >
+          <mesh geometry={geometry}>
+            <meshStandardMaterial
+              color={ACCENT}
+              emissive={isHovered ? ACCENT : "#0a2a4a"}
+              emissiveIntensity={isHovered ? 0.25 : 0.05}
+              metalness={0.1}
+              roughness={0.4}
+            />
+          </mesh>
+          <Html
+            center
+            position={[0, 0, 0]}
+            distanceFactor={3}
+            style={{
+              pointerEvents: "none",
+              width: 48,
+              height: 48,
+              borderRadius: "50%",
+              overflow: "hidden",
+              border: "2px solid rgba(122, 240, 255, 0.5)",
+              background: "#0a1628",
+            }}
+          >
+            <img
+              src={member.avatar_url}
+              alt={member.name}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          </Html>
+        </group>
+      )}
       {isHovered && (
         <MemberPanel member={member} primaryLabel={primaryLabel} />
       )}
@@ -225,7 +284,7 @@ function MemberPanel({ member, primaryLabel }: { member: Member; primaryLabel: s
       position={[0, 1.8, 0]}
       distanceFactor={5}
       style={{
-        pointerEvents: "none",
+        pointerEvents: member.github_url ? "auto" : "none",
         width: 280,
         padding: 14,
         background: "rgba(5, 7, 13, 0.88)",
@@ -246,6 +305,16 @@ function MemberPanel({ member, primaryLabel }: { member: Member; primaryLabel: s
       <div style={{ fontSize: 10, opacity: 0.85 }}>
         {member.skills.slice(0, 4).join(" · ")}
       </div>
+      {member.github_url && (
+        <a
+          href={member.github_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "inline-block", marginTop: 8, color: ACCENT, fontSize: 11 }}
+        >
+          GitHub →
+        </a>
+      )}
     </Html>
   );
 }

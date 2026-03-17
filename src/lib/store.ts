@@ -21,6 +21,12 @@ type AppStore = {
   scrollProgress: number;
   /** Eased 0~1 for camera; updated by CameraRig. */
   globalProgress: number;
+  /** First frame rendered (void+hero visible); used to hide loader. */
+  sceneReady: boolean;
+  /** Hero + next scene(s) preload done; used for auto-scroll to Hero. */
+  scene2Ready: boolean;
+  /** Scroll delta per frame (0~1); used by ScrollIndicatorUI. */
+  scrollSpeed: number;
   activeProject: string | null;
   projectRoomSlideIndex: number;
   language: "en" | "ko";
@@ -29,6 +35,9 @@ type AppStore = {
   setCurrentScene: (scene: SceneId) => void;
   setScrollProgress: (progress: number) => void;
   setGlobalProgress: (p: number) => void;
+  setSceneReady: (v: boolean) => void;
+  setScene2Ready: (v: boolean) => void;
+  setScrollSpeed: (v: number) => void;
   setActiveProject: (slug: string | null) => void;
   setProjectRoomSlideIndex: (index: number) => void;
   setLanguage: (lang: "en" | "ko") => void;
@@ -40,6 +49,9 @@ export const useStore = create<AppStore>((set) => ({
   currentScene: "void",
   scrollProgress: 0,
   globalProgress: 0,
+  sceneReady: false,
+  scene2Ready: false,
+  scrollSpeed: 0,
   activeProject: null,
   projectRoomSlideIndex: 0,
   language: "en",
@@ -48,6 +60,9 @@ export const useStore = create<AppStore>((set) => ({
   setCurrentScene: (currentScene) => set({ currentScene }),
   setScrollProgress: (scrollProgress) => set({ scrollProgress }),
   setGlobalProgress: (globalProgress) => set({ globalProgress }),
+  setSceneReady: (sceneReady) => set({ sceneReady }),
+  setScene2Ready: (scene2Ready) => set({ scene2Ready }),
+  setScrollSpeed: (scrollSpeed) => set({ scrollSpeed }),
   setActiveProject: (activeProject) =>
     set(activeProject
       ? { activeProject, projectRoomSlideIndex: 0, interactionMode: "project-room" as const }

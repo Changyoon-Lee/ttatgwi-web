@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useStore } from "@/lib/store";
+import { scrollToProgress } from "@/lib/scrollToProgress";
 
+/** Progress (0–1) per section; aligned with orchestrationSpec scene midpoints. */
 const ITEMS: { label: string; progress: number }[] = [
-  { label: "WORK", progress: 5 / 9 },
-  { label: "PHILOSOPHY", progress: 1 / 9 },
-  { label: "TEAM", progress: 8 / 9 },
+  { label: "HERO", progress: 0.12 },
+  { label: "WORK", progress: 0.59 },
+  { label: "TEAM", progress: 0.91 },
   { label: "CONTACT", progress: 1 },
 ];
 
@@ -17,12 +19,7 @@ export function NavMinimal() {
   const setScrollProgress = useStore((s) => s.setScrollProgress);
 
   const handleClick = (progress: number) => {
-    const wrapper = document.querySelector("[data-canvas-wrapper]");
-    const scrollEl = wrapper?.children[1] as HTMLElement | undefined;
-    if (scrollEl && "scrollTop" in scrollEl) {
-      const height = scrollEl.scrollHeight - window.innerHeight;
-      scrollEl.scrollTo({ top: Math.max(0, progress * height), behavior: "smooth" });
-    }
+    scrollToProgress(progress);
     setScrollProgress(progress);
   };
 

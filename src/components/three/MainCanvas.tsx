@@ -1,6 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ScrollControls, Environment } from "@react-three/drei";
 import { useStore } from "@/lib/store";
@@ -10,6 +10,7 @@ import { getSceneConfigs } from "@/lib/camera/sceneRegistry";
 import { CameraRig } from "./CameraRig";
 import { ScrollController } from "./ScrollController";
 import { PreloadTrigger } from "./PreloadTrigger";
+import { SceneReadySignal } from "./SceneReadySignal";
 import { VoidEnvironment } from "./VoidEnvironment";
 import { WebGLContextHandler } from "./WebGLContextHandler";
 import { GlassCorridorScene, CorridorFog } from "@/components/scenes/GlassCorridorScene";
@@ -25,6 +26,7 @@ function SceneContent() {
   return (
     <>
       <WebGLContextHandler />
+      <SceneReadySignal />
       <VoidEnvironment />
       <CorridorFog />
       <CameraRig />
@@ -48,14 +50,27 @@ function SceneContent() {
 }
 
 export function MainCanvas() {
+  const [dprMax, setDprMax] = useState(2);
+  useEffect(() => {
+    setDprMax(Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2));
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-[#05070d]" data-canvas-wrapper>
       <Canvas
         gl={{ antialias: true, alpha: true }}
         camera={{ position: [0, 0, 50], fov: 50 }}
-        dpr={[1, 2]}
+        dpr={[1, dprMax]}
       >
-        <ScrollControls pages={11} damping={0.12}>
+        <ScrollControls
+          pages={11}
+          damping={0.12}
+          maxSpeed={0.04}
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
           <SceneContent />
         </ScrollControls>
       </Canvas>

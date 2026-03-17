@@ -1,8 +1,9 @@
 /**
  * Scroll → progress: scrollY → normalize → damped progress → scene progress.
- * Recommended damping 0.08–0.12 (MainCanvas uses 0.12).
+ * Higher = scene follows scroll position faster (less "scroll then sudden jump").
+ * Recommended range 0.08–0.15.
  */
-export const PROGRESS_LERP = 0.08;
+export const PROGRESS_LERP = 0.12;
 
 /** Ease raw scroll offset (0~1) into smoothed progress. Call every frame. */
 export function easeProgress(

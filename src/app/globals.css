@@ -21,6 +21,15 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Hide scrollbar for ScrollControls container (immersive scroll) */
+[data-canvas-wrapper] > div > div:last-child {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+[data-canvas-wrapper] > div > div:last-child::-webkit-scrollbar {
+  display: none;
+}
+
 /* Glass UI */
 .glass {
   background: rgba(5, 7, 13, 0.6);

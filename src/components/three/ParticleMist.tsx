@@ -4,7 +4,7 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-const COUNT = 1800;
+const COUNT = 1200;
 const SIZE = 0.02;
 const OPACITY = 0.3;
 

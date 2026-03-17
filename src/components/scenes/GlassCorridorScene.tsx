@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { MeshTransmissionMaterial } from "@react-three/drei";
 import { useStore } from "@/lib/store";
 import { preloadSceneAssets } from "@/lib/preload";
+import { getSceneRange, getSectionProgress } from "@/lib/camera/sceneRanges";
 
 const TUBE_RADIUS = 4;
 const TUBE_SEGMENTS = 120;
@@ -14,6 +15,7 @@ const FLOW_RING_RADIUS = 4.1;
 const FLOW_RING_TUBE = 0.05;
 const RING_Z = [-5, -10, -15, -20];
 const PARTICLE_COUNT = 800;
+const TUBE_PHASE_THRESHOLD = 0.55;
 
 /** Corridor fog when in corridor segment. Mount in Canvas (e.g. MainCanvas). */
 export function CorridorFog() {
@@ -78,6 +80,16 @@ function CorridorParticleFlow() {
 export function GlassCorridorScene() {
   const groupRef = useRef<THREE.Group>(null);
   const currentScene = useStore((s) => s.currentScene);
+  const globalProgress = useStore((s) => s.globalProgress);
+
+  const corridorRange = useMemo(() => getSceneRange("corridor"), []);
+  const corridorLocal =
+    corridorRange != null
+      ? getSectionProgress(globalProgress, corridorRange.start, corridorRange.end)
+      : 0;
+
+  const showTube = corridorLocal < TUBE_PHASE_THRESHOLD;
+  const showRingsAndEffects = corridorLocal >= TUBE_PHASE_THRESHOLD;
 
   const tubePath = useMemo(() => {
     return new THREE.CatmullRomCurve3(
@@ -111,32 +123,38 @@ export function GlassCorridorScene() {
 
   return (
     <group ref={groupRef}>
-      <mesh geometry={tubeGeometry} scale={1}>
-        <MeshTransmissionMaterial
-          transmission={1}
-          thickness={0.8}
-          roughness={0.05}
-          ior={1.45}
-          chromaticAberration={0.04}
-          anisotropy={0.2}
-          color="#c9e7ff"
-          side={THREE.BackSide}
-        />
-      </mesh>
-      {RING_Z.map((z, i) => (
-        <mesh key={i} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[FLOW_RING_RADIUS, FLOW_RING_TUBE, 16, 200]} />
-          <meshBasicMaterial color="#7af0ff" />
+      {showTube && (
+        <mesh geometry={tubeGeometry} scale={1}>
+          <MeshTransmissionMaterial
+            transmission={1}
+            thickness={0.8}
+            roughness={0.05}
+            ior={1.45}
+            chromaticAberration={0.04}
+            anisotropy={0.2}
+            color="#c9e7ff"
+            side={THREE.BackSide}
+          />
         </mesh>
-      ))}
-      <CorridorParticleFlow />
-      <ambientLight intensity={0.3} />
-      <pointLight
-        position={[0, 0, -15]}
-        intensity={2}
-        color="#7af0ff"
-        distance={50}
-      />
+      )}
+      {showRingsAndEffects && (
+        <>
+          {RING_Z.map((z, i) => (
+            <mesh key={i} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[FLOW_RING_RADIUS, FLOW_RING_TUBE, 16, 200]} />
+              <meshBasicMaterial color="#7af0ff" />
+            </mesh>
+          ))}
+          <CorridorParticleFlow />
+          <ambientLight intensity={0.3} />
+          <pointLight
+            position={[0, 0, -15]}
+            intensity={2}
+            color="#7af0ff"
+            distance={50}
+          />
+        </>
+      )}
     </group>
   );
 }

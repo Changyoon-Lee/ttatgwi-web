@@ -39,8 +39,13 @@ export function preloadScene(sceneId: SceneId): void {
   }
 }
 
-/** Legacy: bulk preload during Entry (can call preloadScene in sequence). */
-export function preloadSceneAssets(): void {
+/**
+ * Bulk preload during Entry: hero then corridor (and optionally more).
+ * Calls callback when done. Currently sync; add useGLTF.preload etc. later for async.
+ */
+export function preloadSceneAssets(callback?: () => void): void {
   if (typeof window === "undefined") return;
   preloadScene("hero");
+  preloadScene("corridor");
+  callback?.();
 }
