@@ -11,4 +11,3 @@ export {
 export type { SceneSpec, CameraMode, LookTarget, SceneLifecycleState, InteractionType } from "./orchestrationSpec";
 export { createMasterPath, SCENE_Z } from "./masterPath";
 export { createLookAtPath } from "./lookAtPath";
-export { PROGRESS_LERP, easeProgress } from "./scrollMapper";

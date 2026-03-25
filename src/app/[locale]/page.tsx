@@ -9,6 +9,7 @@ import { SlideViewer } from "@/components/ui/SlideViewer";
 import { LocaleSync } from "@/components/ui/LocaleSync";
 import { ScrollIndicatorUI } from "@/components/ui/ScrollIndicatorUI";
 import { MouseGlow } from "@/components/ui/MouseGlow";
+import { CameraDebugPanel } from "@/components/ui/CameraDebugPanel";
 import { scrollToProgressAnimated } from "@/lib/scrollToProgress";
 
 const MainCanvas = dynamic(
@@ -68,6 +69,7 @@ export default function HomePage() {
       <NavMinimal />
       <ScrollIndicatorUI />
       <SlideViewer />
+      <CameraDebugPanel />
     </>
   );
 }

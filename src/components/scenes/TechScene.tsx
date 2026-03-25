@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { MeshTransmissionMaterial, Text, Html, Billboard, Image } from "@react-three/drei";
@@ -13,6 +13,11 @@ const RING_COLOR = "#3a4aff";
 const PARTICLE_COUNT = 2000;
 
 const ICON_COLOR = "7af0ff";
+
+const DEBUG_TECH_SCENE = process.env.NODE_ENV !== "production";
+
+let lastTechMountLogAt = 0;
+let lastTechTextureLogAt = 0;
 
 type TechItem = {
   id: string;
@@ -156,7 +161,8 @@ function OrbitNode({
             <Text
               position={[0, 0.25, 0]}
               fontSize={0.16}
-              color="rgba(201,231,255,0.8)"
+              color="#c9e7ff"
+              fillOpacity={0.8}
               anchorX="center"
               anchorY="middle"
               maxWidth={2.2}
@@ -252,8 +258,63 @@ function TechPhilosophy() {
   );
 }
 
+function prefetchTechIconUrls(): Promise<void> {
+  const urls = TECH_ITEMS.map(
+    (tech) => `https://cdn.simpleicons.org/${tech.iconSlug}/${ICON_COLOR}`
+  );
+  return Promise.all(
+    urls.map(
+      (url) =>
+        new Promise<void>((resolve) => {
+          const img = new window.Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = url;
+        })
+    )
+  ).then(() => undefined);
+}
+
 export function TechScene() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const firstFrameLogged = useRef(false);
+
+  useEffect(() => {
+    if (!DEBUG_TECH_SCENE) return;
+    const t = performance.now();
+    if (t - lastTechMountLogAt < 350) return;
+    lastTechMountLogAt = t;
+    console.log("[TechScene] react-mount", { t });
+  }, []);
+
+  useEffect(() => {
+    if (!DEBUG_TECH_SCENE) return;
+    let cancelled = false;
+    prefetchTechIconUrls().then(() => {
+      if (cancelled) return;
+      const t = performance.now();
+      if (t - lastTechTextureLogAt < 350) return;
+      lastTechTextureLogAt = t;
+      console.log("[TechScene] external-icon-textures-loaded", {
+        count: TECH_ITEMS.length,
+        t,
+        note: "simpleicons CDN 프리패치 완료; drei Image는 동일 URL 캐시 히트 가능",
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useFrame(() => {
+    if (!DEBUG_TECH_SCENE || firstFrameLogged.current) return;
+    firstFrameLogged.current = true;
+    console.log("[TechScene] first-r3f-frame", {
+      t: performance.now(),
+      note: "씬 첫 업데이트; MeshTransmission 등 쉐이더는 이후 드로우에서 추가 컴파일될 수 있음",
+    });
+  });
 
   return (
     <group>

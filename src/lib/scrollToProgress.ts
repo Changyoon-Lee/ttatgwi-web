@@ -1,7 +1,15 @@
 /**
  * Scroll the main scroll container (drei ScrollControls) to a normalized progress (0–1).
+ * Uses hybrid scroll state (target + progress) so camera and scroll stay in sync.
  * Container is found by searching [data-canvas-wrapper] for the scrollable div (overflow-y auto, scrollHeight > clientHeight).
  */
+
+import {
+  getProgress,
+  setProgress,
+  setProgressAndTarget,
+  setAnimating,
+} from "./hybridScroll";
 
 function findScrollableIn(wrapper: Element): HTMLElement | null {
   const overflowY = (el: Element) =>
@@ -34,10 +42,12 @@ export function getScrollContainer(): { el: HTMLElement; maxScroll: number } | n
 }
 
 export function scrollToProgress(progress: number): void {
+  const p = Math.max(0, Math.min(1, progress));
+  setProgressAndTarget(p);
   const container = getScrollContainer();
-  if (!container) return;
-  const targetTop = Math.max(0, Math.min(1, progress)) * container.maxScroll;
-  container.el.scrollTo({ top: targetTop, behavior: "smooth" });
+  if (container) {
+    container.el.scrollTop = p * container.maxScroll;
+  }
 }
 
 function runScrollAnimated(
@@ -46,16 +56,24 @@ function runScrollAnimated(
   targetProgress: number,
   durationMs: number
 ): void {
-  const targetTop = Math.max(0, Math.min(1, targetProgress)) * maxScroll;
-  const startTop = el.scrollTop;
+  const targetP = Math.max(0, Math.min(1, targetProgress));
+  setAnimating(true);
+  const startP = getProgress();
   const startTime = performance.now();
 
   function tick(now: number) {
     const elapsed = now - startTime;
     const t = Math.min(1, elapsed / durationMs);
     const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    el.scrollTop = startTop + (targetTop - startTop) * eased;
-    if (t < 1) requestAnimationFrame(tick);
+    const p = startP + (targetP - startP) * eased;
+    setProgress(p);
+    el.scrollTop = p * maxScroll;
+    if (t < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      setProgressAndTarget(targetP);
+      setAnimating(false);
+    }
   }
   requestAnimationFrame(tick);
 }

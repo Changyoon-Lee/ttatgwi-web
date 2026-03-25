@@ -16,7 +16,23 @@
 
 ---
 
-## “엄청 돌려도 안 되다가 어느 순간 팍 이동”하는 이유 (로딩 아님)
+## Hybrid Scroll Controller (현재 방식)
+
+휠은 **의도 신호**만 보내고, 카메라가 **일정한 최대 속도**로 따라가게 하는 방식입니다.
+
+- **흐름**: `wheel` → `target` 갱신 → 매 프레임 `progress`가 `target`을 향해 **velocity clamp**로 이동 → 카메라·스크롤 위치 동기화
+- **결과**: 트랙패드/마우스휠/터치 모두 비슷한 체감, **cinematic camera motion**, 스크롤 많이 해도 카메라 속도는 상한으로 고정
+
+| 목적 | 파일 | 항목 |
+|------|------|------|
+| **휠 한 번에 target이 움직이는 양** | `src/lib/hybridScroll.ts` | **`WHEEL_FACTOR`** (0.0008). 키우면 휠 한 번에 더 많이 진행, 줄이면 더 조금씩. |
+| **카메라가 따라가는 최대 속도(프레임당)** | `src/lib/hybridScroll.ts` | **`MAX_VELOCITY`** (0.003). 키우면 더 빨리, 줄이면 더 천천히·부드럽게. |
+
+휠 리스너는 `HybridScrollWheel.tsx`에서 스크롤 컨테이너에 붙으며, `scrollToProgress` / `scrollToProgressAnimated`는 이 target·progress와 연동되어 있습니다.
+
+---
+
+## “엄청 돌려도 안 되다가 어느 순간 팍 이동”하는 이유 (로딩 아님) — 참고(구 방식)
 
 스크롤은 **바로** 반영되지만, 씬/카메라가 움직이는 값은 **두 단계**를 거쳐서 따라옵니다.
 
@@ -188,3 +204,114 @@
 3. (고급) 씬 경계 구간에서 **이전 씬의 lookAt과 다음 씬의 lookAt을 progress에 따라 lerp** 하도록 CameraRig에 transition zone을 두면, 각도가 “확”이 아니라 “슬쩍” 바뀌게 할 수 있음.
 
 위 표와 경로 파일만 보면서 **해당 씬의 lookAt 설정 부분**만 수정해 보시면 됩니다.
+
+
+
+
+씬/구간별로 **위치(pos)** 와 **lookAt** 이 어떻게 정해지는지, 주요 전환 시점 기준으로 표로 정리했습니다.
+
+---
+
+## 1. 스크롤 progress 구간 (전환 시점)
+
+| progress 구간 | 씬 ID | 비고 |
+|---------------|--------|------|
+| 0 ~ 0.08 | void | 입장 ~ Hero 접근 |
+| 0.08 ~ 0.18 | hero | Hero 구간 |
+| 0.18 ~ 0.28 | corridor | 튜브 구간 |
+| 0.28 ~ 0.40 | domains | 도메인 갤러리 |
+| 0.40 ~ 0.52 | method | 메서드 씬 |
+| 0.52 ~ 0.66 | portfolio | 포트폴리오 |
+| 0.66 ~ 0.78 | projectRoom | 프로젝트 룸 |
+| 0.78 ~ 0.87 | tech | 테크 씬 |
+| 0.87 ~ 0.95 | team | 팀 씬 |
+| 0.95 ~ 1.0 | contact | 연락처 |
+
+(구간은 `orchestrationSpec.ts`의 `progressStart` / `progressEnd` 기준.)
+
+---
+
+## 2. 씬별 위치(pos) vs lookAt — 주요 지점·변화 시점
+
+| 씬 | 전환/구간 | 위치(pos) | lookAt | 비고 |
+|----|-----------|-----------|--------|------|
+| **void** | 전체 | `masterPath.getPointAt(progress)` | `lookAtPath.getPointAt(progress)` | 경로만 사용. progress 0→0.08에 따라 입장~Hero 쪽으로 이동. |
+| **hero** | progress 진입 직후 ~ hero 구간 40% | `masterPath.getPointAt(progress)` | `lookAtPath.getPointAt(progress)` | void와 동일 경로로 Hero 쪽 접근. |
+| **hero** | hero 구간 40% ~ 100% | 원 궤도: 반지름 6, y=0.8, 중심 z=-70, `time*0.1` 회전 | **(0, 0, -70)** 고정 | **주요 변화 시점**: heroLocal=0.4에서 경로 → 궤도로 전환. Hero 중심을 계속 바라봄. |
+| **corridor** | 전체 | `corridorPath.getPointAt(corridorLocal)` + x/y 시간 미세 흔들림 | `corridorPath.getPointAt(corridorLocal + 0.02)` | 튜브 경로를 따라 이동, 시선은 경로상 “조금 앞” 점. |
+| **domains** | 전체 | 원 궤도: 반지름 10, y=2, 중심 z=-212, `time*0.2` | **(0, 0, -212)** 고정 | **주요 변화 시점**: hero→corridor 직후(0.28)에서 궤도+고정 lookAt으로 전환. |
+| **method** | 전체 | (0, 2, -268 + methodLocal×3). methodLocal에 따라 z만 전진 | **(0, 0, -280)** 고정 | 전진하면서 항상 (0,0,-280)을 봄. |
+| **portfolio** | 전체 | 원 궤도: 반지름 12, y=2, 중심 z=-350, `time*0.15` | **(0, 0, -370)** 고정 | 갤러리 앞쪽(z=-370)을 바라봄. |
+| **projectRoom** | 전체 | `projectRoomRail.getPointAt(projectRoomProgress)` | 같은 레일의 `projectRoomProgress + 0.08` 지점 | 슬라이드 인덱스에 따라 레일 위 위치·시선. |
+| **tech** | 전체 | 원 궤도: 반지름 10, y=2, 중심 z=-490, `time*0.12` | **(0, 0, -490)** 고정 | 테크 코어 중심. |
+| **team** | 전체 | 원 궤도: 반지름 10, y=2, 중심 z=-560, `time*0.1` | **(0, 0, -560)** 고정 | 팀 씬 중심. |
+| **contact** | 전체 | `masterPath.getPointAt(progress)` + x/y 시간 미세 흔들림 | `lookAtPath.getPointAt(progress)` | 다시 전역 경로 사용. |
+
+---
+
+## 3. “주요 변화 시점”만 모은 요약
+
+| 시점 (progress / 조건) | 위치 변화 | lookAt 변화 |
+|------------------------|-----------|-------------|
+| **0** | master 경로 시작 | lookAt 경로 시작 |
+| **0.08** (void → hero) | 같은 master 경로 유지 | 같은 lookAt 경로 유지 |
+| **hero 구간 40%** (대략 0.12) | **경로 → Hero 주변 원 궤도** | **경로 → (0,0,-70) 고정** |
+| **0.18** (hero → corridor) | **궤도 → corridor 경로** | **(0,0,-70) → 경로 상 앞쪽 점** |
+| **0.28** (corridor → domains) | **경로 → domains 원 궤도** | **경로 → (0,0,-212) 고정** |
+| **0.40** (domains → method) | **궤도 → 전진 (0,2,z)** | **(-212) → (0,0,-280)** |
+| **0.52** (method → portfolio) | **전진 → portfolio 궤도** | **(-280) → (0,0,-370)** |
+| **0.66** (portfolio → projectRoom) | **궤도 → 레일 경로** | **고정 → 레일 앞쪽 점** |
+| **0.78** (projectRoom → tech) | **레일 → tech 궤도** | **레일 → (0,0,-490)** |
+| **0.87** (tech → team) | **tech 궤도 → team 궤도** | **(-490) → (0,0,-560)** |
+| **0.95** (team → contact) | **team 궤도 → master 경로** | **(-560) → lookAt 경로** |
+| **1.0** | master 경로 끝 | lookAt 경로 끝 |
+
+---
+
+위 표들이 “씬 이동에 따른 위치 변화와 lookAt이 어떻게 되는지, 주요 지점·주요 변화 시점”을 담은 정리입니다. 파일을 수정하지 않고 표만 정리한 것이므로, 필요하면 이 표를 `scroll-tuning.md` 등에 복사해 두고 쓰시면 됩니다.
+
+---
+
+## Trigger 기반 Scene Scroll (현재 적용)
+
+현재 스크롤 시스템은 `ScrollControls.offset` 기반 연속 스크롤이 아니라, **씬/체크포인트 트리거 FSM** 방식입니다.
+
+흐름:
+
+`wheel` 입력 -> `notifyWheel` 트리거 -> `tickProgress(delta)` 자동 이동 -> checkpoint 도착 후 잠금(N초)
+
+### 핵심 파일
+
+- `src/lib/hybridScroll.ts`
+  - 씬별 체크포인트 정의 + 기본값/오버라이드
+  - 상태: `moving`, `locked`, `animating`
+  - API: `notifyWheel`, `tickProgress`, `setProgressAndTarget`, `getDebugState`
+- `src/components/three/HybridScrollWheel.tsx`
+  - wheel 입력을 받아 `notifyWheel(deltaY)` 호출
+- `src/components/three/CameraRig.tsx`
+  - 매 프레임 `tickProgress(state.clock.getDelta())`로 progress 갱신
+  - progress에 따라 카메라 경로/시선 계산
+
+### 튜닝 포인트
+
+| 목적 | 파일 | 항목 |
+|------|------|------|
+| 전체 기본 이동 속도 상한 | `src/lib/hybridScroll.ts` | `DEFAULT_MOVE_MAX_SPEED` |
+| 씬 진입 첫 체크포인트 잠금 | `src/lib/hybridScroll.ts` | `DEFAULT_ENTRY_LOCK_SEC`, `scenePlan.entryLockSec` |
+| 체크포인트 도착 후 정지 시간 | `src/lib/hybridScroll.ts` | `DEFAULT_HOLD_SEC`, `scenePlan.holdSec` |
+| 씬별 이동 속도 오버라이드 | `src/lib/hybridScroll.ts` | `scenePlan.moveMaxSpeed` |
+| 같은 씬 내 추가 스크롤 가속량 | `src/lib/hybridScroll.ts` | `SAME_SCENE_BOOST_MULTIPLIER`, `SAME_SCENE_BOOST_FRAMES` |
+| 씬 내부 세부 정지 지점 | `src/lib/hybridScroll.ts` | `scenePlan.checkpoints[]` |
+
+### 체크포인트 규칙
+
+- `scenePlan.checkpoints[]`가 있으면 해당 배열 사용
+- 없으면 씬 구간의 midpoint를 자동 사용
+- 예: `hero: [0.10, 0.14, 0.17]`처럼 씬 내부 여러 정지 지점 지정 가능
+
+### 디버그 패널
+
+- 파일: `src/components/ui/CameraDebugPanel.tsx`
+- 개발모드에서만 동작
+- 백틱(`) 키로 토글
+- 확인 가능 항목: `scene`, `progress`, `checkpoint index`, `moving/locked`, `lockRemainingSec`, `camera pos/look`

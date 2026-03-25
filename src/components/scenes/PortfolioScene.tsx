@@ -35,38 +35,35 @@ type Project = {
 
 const projects = projectsData as Project[];
 
-/** Organic cluster layout: avoid overlap, spread in volume x(-15,15) y(-2,4) z(-10,-30) */
+/** Deterministic layout so camera checkpoints match panel order. */
 function useProjectPositions(count: number): [number, number, number][] {
   return useMemo(() => {
-    const out: [number, number, number][] = [];
-    const minDist = 7;
-    let attempts = 0;
-    while (out.length < count && attempts < 200) {
-      const x = (Math.random() - 0.5) * 30;
-      const y = (Math.random() - 0.3) * 6;
-      const z = -20 - Math.random() * 20;
-      const ok = out.every(
-        (p) =>
-          Math.hypot(p[0] - x, p[1] - y, p[2] - z) >= minDist
-      );
-      if (ok) out.push([x, y, z]);
-      attempts++;
+    const grid: [number, number, number][] = [
+      [-10, 1, -18],
+      [10, 0, -18],
+      [-9, 2.5, -28],
+      [9, -0.5, -28],
+    ];
+    if (count <= grid.length) {
+      return grid.slice(0, count);
     }
-    if (out.length < count) {
-      out.length = 0;
-      const grid = [
-        [-10, 1, -18],
-        [10, 0, -18],
-        [-9, 2.5, -28],
-        [9, -0.5, -28],
-      ];
-      grid.slice(0, count).forEach((p) => out.push(p as [number, number, number]));
+    const out = [...grid];
+    for (let i = grid.length; i < count; i++) {
+      const row = Math.floor(i / 4);
+      const col = i % 4;
+      const x = -12 + col * 8;
+      const y = 1 - row * 0.5;
+      const z = -18 - row * 10;
+      out.push([x, y, z]);
     }
     return out;
   }, [count]);
 }
 
-/** Connection pairs for NodeConnections (project network) */
+/**
+ * 연결선(무방향). 카메라 포커스 순서는 `CameraRig`에서
+ * dashboard → automation → platform → game 으로 맞춤.
+ */
 const NODE_CONNECTIONS: [string, string][] = [
   ["dashboard", "automation"],
   ["game", "platform"],

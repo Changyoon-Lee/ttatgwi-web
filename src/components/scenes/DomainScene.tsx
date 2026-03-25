@@ -15,9 +15,9 @@ const VIOLET = "#b48dff";
 /** Domain sculpture config: position (local to DomainScene), key for i18n, element type */
 const DOMAINS = [
   { key: "structure" as const, pos: [-6, 0, -2] as [number, number, number], element: "frames" as const },
-  { key: "insight" as const, pos: [0, 0, -8] as [number, number, number], element: "liquidSphere" as const },
-  { key: "build" as const, pos: [6, 0, -2] as [number, number, number], element: "modules" as const },
-  { key: "experience" as const, pos: [0, 0, 4] as [number, number, number], element: "organic" as const },
+  // { key: "insight" as const, pos: [0, 0, -8] as [number, number, number], element: "liquidSphere" as const },
+  // { key: "build" as const, pos: [6, 0, -2] as [number, number, number], element: "modules" as const },
+  // { key: "experience" as const, pos: [0, 0, 4] as [number, number, number], element: "organic" as const },
 ];
 
 function GalleryFloor() {
@@ -230,9 +230,9 @@ export function DomainScene() {
           onPointerOver={(e) => e.stopPropagation()}
         >
           {d.element === "frames" && <StructureSculpture />}
-          {d.element === "liquidSphere" && <InsightSculpture />}
+          {/* {d.element === "liquidSphere" && <InsightSculpture />}
           {d.element === "modules" && <BuildSculpture />}
-          {d.element === "organic" && <ExperienceSculpture />}
+          {d.element === "organic" && <ExperienceSculpture />} */}
           <DomainLabel domainKey={d.key} hovered={hovered === d.key} />
         </group>
       ))}
